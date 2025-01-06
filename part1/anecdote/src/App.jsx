@@ -1,44 +1,69 @@
-import { useState } from 'react'
+import { useState } from "react";
+
+const Button = ({ onClick, text }) => <button onClick={onClick}>{text}</button>;
+
+const AnecdotesMost = ({ points, anecdotes }) => {
+  const calcMax = () => {
+    let index = 0;
+    let max = points[0];
+    for (let i = 1; i < points.length; i++) {
+      if (points[i] > max) {
+        max = points[i];
+        index = i;
+      }
+    }
+    return index;
+  };
+
+  let mostVotes = calcMax();
+  if (points[mostVotes] === 0) return <div>No Anecdotes have been selected</div>;
+
+  return (
+    <>
+      <div>{anecdotes[mostVotes]}</div>
+      <div>has {points[mostVotes]}</div>
+    </>
+  );
+};
 
 const App = () => {
   const anecdotes = [
-    'If it hurts, do it more often.',
-    'Adding manpower to a late software project makes it later!',
-    'The first 90 percent of the code accounts for the first 90 percent of the development time...The remaining 10 percent of the code accounts for the other 90 percent of the development time.',
-    'Any fool can write code that a computer can understand. Good programmers write code that humans can understand.',
-    'Premature optimization is the root of all evil.',
-    'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.',
-    'Programming without an extremely heavy use of console.log is same as if a doctor would refuse to use x-rays or blood tests when diagnosing patients.',
-    'The only way to go fast, is to go well.'
-  ]
-   
-  const [selected, setSelected] = useState(0)
-  const [points, setPoints] = useState(Array(anecdotes.length).fill(0))
+    "If it hurts, do it more often.",
+    "Adding manpower to a late software project makes it later!",
+    "The first 90 percent of the code accounts for the first 90 percent of the development time...The remaining 10 percent of the code accounts for the other 90 percent of the development time.",
+    "Any fool can write code that a computer can understand. Good programmers write code that humans can understand.",
+    "Premature optimization is the root of all evil.",
+    "Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.",
+    "Programming without an extremely heavy use of console.log is same as if a doctor would refuse to use x-rays or blood tests when diagnosing patients.",
+    "The only way to go fast, is to go well.",
+  ];
+
+  const [selected, setSelected] = useState(0);
+  const [points, setPoints] = useState(Array(anecdotes.length).fill(0));
 
   const random = () => {
-    setSelected(Math.floor(Math.random() * (anecdotes.length)))
-  }
-  
+    setSelected(Math.floor(Math.random() * anecdotes.length));
+  };
+
   const handleClick = () => {
-    const copy = [...points]
-    copy[selected] += 1
-    setPoints(copy)
-  }
+    const copy = [...points];
+    copy[selected] += 1;
+    setPoints(copy);
+  };
 
   return (
     <div>
+      <h2>Anecdotes of the day</h2>
+      <div>{anecdotes[selected]}</div>
+      <div>has {points[selected]} votes</div>
       <div>
-        {anecdotes[selected]}
+        <Button onClick={handleClick} text="vote" />
+        <Button onClick={random} text="next anecdote" />
       </div>
-      <div>
-        has {points[selected]} votes
-      </div>
-      <div>
-        <button onClick={handleClick}>vote</button>
-        <button onClick={random}>next anecdote</button>
-      </div>
+      <h2>Anecdotes with most votes</h2>
+      <AnecdotesMost points={points} anecdotes={anecdotes} />
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
