@@ -2,20 +2,7 @@ import { useState } from "react";
 
 const Button = ({ onClick, text }) => <button onClick={onClick}>{text}</button>;
 
-const AnecdotesMost = ({ points, anecdotes }) => {
-  const calcMax = () => {
-    let index = 0;
-    let max = points[0];
-    for (let i = 1; i < points.length; i++) {
-      if (points[i] > max) {
-        max = points[i];
-        index = i;
-      }
-    }
-    return index;
-  };
-
-  let mostVotes = calcMax();
+const AnecdotesMost = ({ points, anecdotes, mostVotes }) => {
   if (points[mostVotes] === 0) return <div>No Anecdotes have been selected</div>;
 
   return (
@@ -40,6 +27,7 @@ const App = () => {
 
   const [selected, setSelected] = useState(0);
   const [points, setPoints] = useState(Array(anecdotes.length).fill(0));
+  const [mostVotes, setMostVotes] = useState(0)
 
   const random = () => {
     setSelected(Math.floor(Math.random() * anecdotes.length));
@@ -49,6 +37,10 @@ const App = () => {
     const copy = [...points];
     copy[selected] += 1;
     setPoints(copy);
+
+    if (copy[selected] > points[mostVotes]) {
+      setMostVotes(selected)
+    }
   };
 
   return (
@@ -61,7 +53,7 @@ const App = () => {
         <Button onClick={random} text="next anecdote" />
       </div>
       <h2>Anecdotes with most votes</h2>
-      <AnecdotesMost points={points} anecdotes={anecdotes} />
+      <AnecdotesMost points={points} anecdotes={anecdotes} mostVotes={mostVotes}/>
     </div>
   );
 };
