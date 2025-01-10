@@ -39,6 +39,17 @@ const App = () => {
     }
   };
 
+  const deletePerson = (person) => {
+    const confirm = window.confirm(`Delete ${person.name} ?`)
+    if (confirm) {
+      contactService
+        .deleteData(person.id)
+        .then(returnedPerson => {
+          setPersons(persons.filter(person => person.id !== returnedPerson.id))
+        })
+    } 
+  }
+
   const searchResults = persons.filter((person) =>
     person.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -56,7 +67,7 @@ const App = () => {
         setNewNumber={setNewNumber}
       />
       <h2>Numbers</h2>
-      <Persons searchResults={searchResults} />
+      <Persons deletePerson={deletePerson} searchResults={searchResults} />
     </div>
   );
 };
