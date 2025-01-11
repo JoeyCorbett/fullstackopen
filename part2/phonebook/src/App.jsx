@@ -11,6 +11,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
   const [successMessage, setSuccessMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     contactService.getAll().then((initialContacts) => {
@@ -32,15 +33,22 @@ const App = () => {
 
   const updateContact = (personObj) => {
     const noteObject = { ...personObj, number: newNumber };
-    contactService.update(personObj.id, noteObject).then((returnedPerson) => {
-      setPersons(
-        persons.map((person) =>
+    
+    contactService
+      .update(personObj.id, noteObject)
+      .then((returnedPerson) => {
+        setPersons(persons.map((person) =>
           person.id === personObj.id ? returnedPerson : person
+        ));
+        setSuccessMessage(`Update ${returnedPerson.name}'s number to ${returnedPerson.number}`)
+        setTimeout(() => setSuccessMessage(null), 4000)
+      })
+      .catch(() => {
+        setErrorMessage(
+          `Information of ${personObj.name} has already been removed from server`
         )
-      );
-      setSuccessMessage(`Update ${returnedPerson.name}'s number to ${returnedPerson.number}`)
-      setTimeout(() => setSuccessMessage(null), 4000)
-    });
+        setTimeout(() => setErrorMessage(null), 3000)
+      })
   };
 
   const addNewContact = () => {
@@ -63,8 +71,7 @@ const App = () => {
         updateContact(personObj);
       }
     } else {
-      const person = addNewContact();
-      console.log(person);
+      addNewContact();
     }
   };
 
@@ -83,7 +90,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={successMessage} />
+      <Notification successMsg={successMessage} errorMsg={errorMessage}/>
       <Filter search={search} setSearch={setSearch} />
       <h2>add a new</h2>
       <PersonForm
