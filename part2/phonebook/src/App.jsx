@@ -1,14 +1,16 @@
-import { useState, useEffect } from "react"
-import Filter from "./components/Filter"
-import PersonForm from "./components/PersonForm"
-import Persons from "./components/Persons"
-import contactService from "./services/contacts"
+import { useState, useEffect } from "react";
+import Filter from "./components/Filter";
+import PersonForm from "./components/PersonForm";
+import Persons from "./components/Persons";
+import Notification from "./components/Notification";
+import contactService from "./services/contacts";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
+  const [successMessage, setSuccessMessage] = useState(null);
 
   useEffect(() => {
     contactService.getAll().then((initialContacts) => {
@@ -20,40 +22,49 @@ const App = () => {
     return persons.find(
       (person) => person.name.toLowerCase() === name.toLowerCase()
     );
-  }
+  };
 
   const confirmUpdate = (personName) => {
     return window.confirm(
       `${personName} is already added to phonebook, replace the old number with a new one?`
     );
-  }
+  };
 
   const updateContact = (personObj) => {
     const noteObject = { ...personObj, number: newNumber };
-    contactService.update(personObj.id, noteObject).then(returnedPerson => {
-      setPersons(persons.map(person => person.id === personObj.id ? returnedPerson : person))
+    contactService.update(personObj.id, noteObject).then((returnedPerson) => {
+      setPersons(
+        persons.map((person) =>
+          person.id === personObj.id ? returnedPerson : person
+        )
+      );
+      setSuccessMessage(`Update ${returnedPerson.name}'s number to ${returnedPerson.number}`)
+      setTimeout(() => setSuccessMessage(null), 4000)
     });
-  }
+  };
 
   const addNewContact = () => {
     const noteObject = { name: newName, number: newNumber };
     contactService.create(noteObject).then((returnedContact) => {
-      setPersons(persons.concat(returnedContact));33
+      setPersons(persons.concat(returnedContact));
       setNewName("");
       setNewNumber("");
+      setSuccessMessage(`Added ${returnedContact.name}`);
+      setTimeout(() => setSuccessMessage(null), 3000);
     });
-  }
+  };
 
   const addNote = (e) => {
     e.preventDefault();
 
-    const personObj = findPerson(newName)
+    const personObj = findPerson(newName);
     if (personObj) {
       if (confirmUpdate(personObj.name)) {
-        updateContact(personObj)
+        updateContact(personObj);
       }
     } else {
-      addNewContact()
+      const person = addNewContact();
+      console.log(person);
     }
   };
 
@@ -72,6 +83,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={successMessage} />
       <Filter search={search} setSearch={setSearch} />
       <h2>add a new</h2>
       <PersonForm
