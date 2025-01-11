@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
-import Filter from './components/Filter'
-import PersonForm from './components/PersonForm'
-import Persons from './components/Persons'
-import contactService from './services/contacts'
-
+import { useState, useEffect } from "react"
+import Filter from "./components/Filter"
+import PersonForm from "./components/PersonForm"
+import Persons from "./components/Persons"
+import contactService from "./services/contacts"
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -12,43 +11,59 @@ const App = () => {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    contactService
-      .getAll()
-      .then(initialContacts => {
-        setPersons(initialContacts)
-      })
-  }, [])
+    contactService.getAll().then((initialContacts) => {
+      setPersons(initialContacts);
+    });
+  }, []);
+
+  const findPerson = (name) => {
+    return persons.find(
+      (person) => person.name.toLowerCase() === name.toLowerCase()
+    );
+  }
+
+  const confirmUpdate = (personName) => {
+    return window.confirm(
+      `${personName} is already added to phonebook, replace the old number with a new one?`
+    );
+  }
+
+  const updateContact = (personObj) => {
+    const noteObject = { ...personObj, number: newNumber };
+    contactService.update(personObj.id, noteObject).then(returnedPerson => {
+      setPersons(persons.map(person => person.id === personObj.id ? returnedPerson : person))
+    });
+  }
+
+  const addNewContact = () => {
+    const noteObject = { name: newName, number: newNumber };
+    contactService.create(noteObject).then((returnedContact) => {
+      setPersons(persons.concat(returnedContact));33
+      setNewName("");
+      setNewNumber("");
+    });
+  }
 
   const addNote = (e) => {
     e.preventDefault();
-    if (
-      persons.some(
-        (person) => person.name.toLowerCase() === newName.toLowerCase()
-      )
-    ) {
-      alert(`${newName} is already added to phonebook`);
+
+    const personObj = findPerson(newName)
+    if (personObj) {
+      if (confirmUpdate(personObj.name)) {
+        updateContact(personObj)
+      }
     } else {
-      const noteObject = { name: newName, number: newNumber };
-      contactService
-        .create(noteObject)
-        .then(returnedContact => {
-          setPersons(persons.concat(returnedContact));
-          setNewName("");
-          setNewNumber("");
-        })
+      addNewContact()
     }
   };
 
   const deletePerson = (person) => {
-    const confirm = window.confirm(`Delete ${person.name} ?`)
-    if (confirm) {
-      contactService
-        .deleteData(person.id)
-        .then(returnedPerson => {
-          setPersons(persons.filter(person => person.id !== returnedPerson.id))
-        })
-    } 
-  }
+    if (confirm(`Delete ${person.name} ?`)) {
+      contactService.deleteData(person.id).then((returnedPerson) => {
+        setPersons(persons.filter((person) => person.id !== returnedPerson.id));
+      });
+    }
+  };
 
   const searchResults = persons.filter((person) =>
     person.name.toLowerCase().includes(search.toLowerCase())
