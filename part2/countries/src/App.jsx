@@ -11,11 +11,27 @@ const Countries = ({ searchResults, query }) => {
     return (
       <>
         {searchResults.map((country) => (
-          <div key={country}>{country}</div>
+          <Country key={country} country={country} />
         ))}
       </>
     )
   }
+}
+
+const Country = ({ country }) => {
+  const [showData, setShowData] = useState(false)
+
+  const handleClick = () => {
+    setShowData(true)
+  }
+
+  return (
+    <div>
+      {country} {""}
+      <button onClick={handleClick}>show</button>
+      {showData ? <CountryData country={country} /> : null}
+    </div>
+  )
 }
 
 const CountryData = ({ country }) => {
@@ -31,10 +47,7 @@ const CountryData = ({ country }) => {
 
   if (!countryInfo || !countryInfo.name) {
     return <p>Loading country data...</p>
-  } else {
-    console.log(Object.values(countryInfo.languages))
-  }
-
+  } 
   
   return (
     <>
