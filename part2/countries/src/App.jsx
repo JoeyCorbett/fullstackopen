@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 
+const api_key = import.meta.env.VITE_SOME_KEY
+
 const Countries = ({ searchResults, query }) => {
   if (!query) return <>Search a country to get started</>
   if (searchResults.length > 10) 
@@ -36,16 +38,30 @@ const Country = ({ country }) => {
 
 const CountryData = ({ country }) => {
   const [countryInfo, setCountryInfo] = useState({})
+  const [weatherInfo, setWeatherInfo] = useState({})
+  const [weatherURL, setWeatherURL] = useState('')
 
   useEffect(() => {
     axios
-      .get(`https://studies.cs.helsinki.fi/restcountries/api/name/${country}`)
+    .get(`https://studies.cs.helsinki.fi/restcountries/api/name/${country}`)
+    .then(response => {
+      setCountryInfo(response.data)
+      return response.data
+    })
+    .then((data) => [
+      axios
+      .get(`https://api.openweathermap.org/data/2.5/weather?q=${data.capital}&appid=${api_key}`)
       .then(response => {
-        setCountryInfo(response.data)
+        setWeatherInfo(response.data)
+        return response.data
       })
+      .then((data) => {
+        setWeatherURL(`https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`)
+      })
+    ])
   }, [country])
 
-  if (!countryInfo || !countryInfo.name) {
+  if (!countryInfo || !countryInfo.name || !weatherInfo.main || !weatherInfo.wind || !weatherURL) {
     return <p>Loading country data...</p>
   } 
   
@@ -69,6 +85,12 @@ const CountryData = ({ country }) => {
         </ul>
       </div>
       <img src={countryInfo.flags.png} alt={`Flag of ${countryInfo.name.common}`} />
+      <h2>Weather in {countryInfo.capital}</h2>
+      <div>
+        <div>Temperature: {Math.trunc(weatherInfo.main.temp - 273.15)} Celcius</div>
+        <img src={weatherURL} />
+        <div>Wind: {weatherInfo.wind.speed} m/s</div>
+      </div>
     </>
   )
 }
