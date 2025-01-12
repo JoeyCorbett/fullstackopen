@@ -1,15 +1,19 @@
-const Notification = ({ successMsg, errorMsg }) => {
-    if (!successMsg && !errorMsg) return null
+const Notification = ({ info }) => {
+    if (!info.message) return
 
-    const message = successMsg ? successMsg : errorMsg;
+    const style = {
+        color: info.type==='error' ? 'red' : 'green',
+        background: 'lightgrey',
+        fontSize: 20,
+        borderStyle: 'solid',
+        borderRadius: 5,
+        padding: 10,
+        marginBottom: 10
+    }
     
-    const notificationClass = successMsg
-        ? 'notification notification-success'
-        : 'notification notification-error'
-
     return (
-        <div className={notificationClass}>
-            {message}
+        <div style={style}>
+            {info.message}
         </div>
     )
 }

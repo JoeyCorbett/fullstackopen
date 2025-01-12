@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
 import Notification from "./components/Notification";
+
 import contactService from "./services/contacts";
 
 const App = () => {
@@ -10,14 +12,24 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
-  const [successMessage, setSuccessMessage] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [info, setInfo] = useState({ message: null });
 
   useEffect(() => {
     contactService.getAll().then((initialContacts) => {
       setPersons(initialContacts);
     });
   }, []);
+
+  const notifyWith = (message, type = "info") => {
+    setInfo({
+      message,
+      type,
+    });
+
+    setTimeout(() => {
+      setInfo({ message: null })
+    }, 3000)
+  };
 
   const findPerson = (name) => {
     return persons.find(
@@ -33,22 +45,25 @@ const App = () => {
 
   const updateContact = (personObj) => {
     const noteObject = { ...personObj, number: newNumber };
-    
+
     contactService
       .update(personObj.id, noteObject)
       .then((returnedPerson) => {
-        setPersons(persons.map((person) =>
-          person.id === personObj.id ? returnedPerson : person
-        ));
-        setSuccessMessage(`Update ${returnedPerson.name}'s number to ${returnedPerson.number}`)
-        setTimeout(() => setSuccessMessage(null), 4000)
+        setPersons(
+          persons.map((person) =>
+            person.id === personObj.id ? returnedPerson : person
+          )
+        );
+        notifyWith(
+          `Update ${returnedPerson.name}'s number to ${returnedPerson.number}`
+        );
       })
       .catch(() => {
-        setErrorMessage(
-          `Information of ${personObj.name} has already been removed from server`
-        )
-        setTimeout(() => setErrorMessage(null), 3000)
-      })
+        notifyWith(
+          `Information of ${personObj.name} has already been removed from server`,
+          "error"
+        );
+      });
   };
 
   const addNewContact = () => {
@@ -57,8 +72,7 @@ const App = () => {
       setPersons(persons.concat(returnedContact));
       setNewName("");
       setNewNumber("");
-      setSuccessMessage(`Added ${returnedContact.name}`);
-      setTimeout(() => setSuccessMessage(null), 3000);
+      notifyWith(`Added ${returnedContact.name}`);
     });
   };
 
@@ -90,7 +104,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification successMsg={successMessage} errorMsg={errorMessage}/>
+      <Notification info={info} />
       <Filter search={search} setSearch={setSearch} />
       <h2>add a new</h2>
       <PersonForm
