@@ -27,8 +27,8 @@ const App = () => {
     });
 
     setTimeout(() => {
-      setInfo({ message: null })
-    }, 3000)
+      setInfo({ message: null });
+    }, 3000);
   };
 
   const findPerson = (name) => {
