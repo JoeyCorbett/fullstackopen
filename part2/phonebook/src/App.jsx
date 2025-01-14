@@ -31,6 +31,11 @@ const App = () => {
     }, 3000);
   };
 
+  const cleanForm = () => {
+    setNewName('');
+    setNewNumber('');
+  }
+
   const findPerson = (name) => {
     return persons.find(
       (person) => person.name.toLowerCase() === name.toLowerCase()
@@ -64,15 +69,15 @@ const App = () => {
           "error"
         );
       });
+      cleanForm()
   };
 
   const addNewContact = () => {
     const noteObject = { name: newName, number: newNumber };
     contactService.create(noteObject).then((returnedContact) => {
       setPersons(persons.concat(returnedContact));
-      setNewName("");
-      setNewNumber("");
       notifyWith(`Added ${returnedContact.name}`);
+      cleanForm()
     });
   };
 
@@ -91,8 +96,10 @@ const App = () => {
 
   const deletePerson = (person) => {
     if (confirm(`Delete ${person.name} ?`)) {
-      contactService.deleteData(person.id).then((returnedPerson) => {
-        setPersons(persons.filter((person) => person.id !== returnedPerson.id));
+      contactService.deleteData(person.id).then(() => {
+        setPersons(persons.filter(p => p.id !== person.id));
+        
+        notifyWith(`number of ${person.name} deleted!`)
       });
     }
   };
