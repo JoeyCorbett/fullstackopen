@@ -74,11 +74,16 @@ const App = () => {
 
   const addNewContact = () => {
     const noteObject = { name: newName, number: newNumber };
-    contactService.create(noteObject).then((returnedContact) => {
+    contactService
+      .create(noteObject)
+      .then((returnedContact) => {
       setPersons(persons.concat(returnedContact));
       notifyWith(`Added ${returnedContact.name}`);
       cleanForm()
-    });
+      })
+      .catch(error => {
+        notifyWith(error.response.data.error, "error")
+      })
   };
 
   const addNote = (e) => {
