@@ -17,9 +17,30 @@ const favoriteBlog = (blogs) => {
   return result
 }
 
+const mostBlogs = (blogs) => {
+  if (blogs.length === 0) return null
+
+  const authors = {}
+  blogs.forEach(blog => {
+    if (!authors[blog.author]) {
+      authors[blog.author] = 0
+    }
+    authors[blog.author] += 1
+  })
+  let max = 0
+  let maxObj = {}
+  Object.entries(authors).forEach(([key, value]) => {
+    if (value > max) {
+      max = value
+      maxObj = { author: key, blogs: value }
+    }
+  })
+  return maxObj
+}
 
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
+  mostBlogs,
 }

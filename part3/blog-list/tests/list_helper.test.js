@@ -76,3 +76,34 @@ describe('favorite blog', () => {
     })
   })
 })
+
+describe('most blogs', () => {
+  const blog = [
+    {
+      _id: '5a422bc61b54a676234d17fc',
+      title: 'Type wars',
+      author: 'Robert C. Martin',
+      url: 'http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html',
+      likes: 2,
+      __v: 0
+    }
+  ]
+
+  test('empty list is null', () => {
+    const result = listHelper.mostBlogs([])
+    assert.strictEqual(result, null)
+  })
+
+  test('when list only has on blog that author is returned', () => {
+    const result = listHelper.mostBlogs(blog)
+    assert.deepStrictEqual(result, { author: 'Robert C. Martin', blogs: 1 })
+  })
+
+  test('returns author with most blogs with blog count as obj', () => {
+    const result = listHelper.mostBlogs(biggerList)
+    assert.deepStrictEqual(result, {
+      author: 'Robert C. Martin',
+      blogs: 3
+    })
+  })
+})
