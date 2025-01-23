@@ -27,6 +27,12 @@ describe('api tests', () => {
 
     assert.strictEqual(blogs.body.length, 6)
   })
+
+  test.only('blog posts use "id" and not "_id"', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+
+    assert.strictEqual(Object.keys(blogsAtStart[0])[4], 'id')
+  })
 })
 
 after (async () => {
