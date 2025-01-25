@@ -56,7 +56,7 @@ describe('api tests', () => {
     assert(titles.includes('test note'))
   })
 
-  test.only('blog added witout id defaults to 0', async () => {
+  test('blog added witout id defaults to 0', async () => {
     const newBlog = {
       title: 'test note',
       author: 'test author',
@@ -75,6 +75,32 @@ describe('api tests', () => {
     assert.strictEqual(likes[likes.length - 1], 0)
 
   })
+})
+
+test.only('blog without title returns 400', async () => {
+  const noTitle = {
+    author: 'test author',
+    url: 'https://example.com',
+    likes: 4,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(noTitle)
+    .expect(400)
+})
+
+test.only('blog without url returns 400', async () => {
+  const noUrl = {
+    title: 'test title',
+    author: 'test author',
+    likes: 2,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(noUrl)
+    .expect(400)
 })
 
 after (async () => {
