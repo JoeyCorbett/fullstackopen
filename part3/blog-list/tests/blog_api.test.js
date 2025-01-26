@@ -77,7 +77,7 @@ describe('api tests', () => {
   })
 })
 
-test.only('blog without title returns 400', async () => {
+test('blog without title returns 400', async () => {
   const noTitle = {
     author: 'test author',
     url: 'https://example.com',
@@ -103,8 +103,32 @@ test.only('blog without url returns 400', async () => {
     .expect(400)
 })
 
+describe('deletion of a blog', () => {
+  test('succeeds with status code 204 if id is valid', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToDelete = blogsAtStart[0]
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(204)
+
+    const blogsAtEnd = await helper.blogsInDb()
+
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+
+    const contents = blogsAtEnd.map(b => b.title)
+    assert(!contents.includes(blogToDelete.title))
+  })
+
+  test('fails with stauts code 404 if id is not valid', async () => {
+    const validNonexistingId = await helper.nonExistingId()
+
+    await api
+      .delete(`/api/blogs/${validNonexistingId}`)
+      .expect(404)
+  })
+})
+
 after (async () => {
   await mongoose.connection.close()
 })
-
-

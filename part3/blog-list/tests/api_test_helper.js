@@ -1,6 +1,19 @@
 const Blog = require('../models/blog')
 const biggerList = require('./biggerList')
 
+const nonExistingId = async () => {
+  const blog = new Blog({
+    title: 'test title',
+    author: 'test author',
+    url: 'https://example.com',
+    likes: 10,
+  })
+  await blog.save()
+  await blog.deleteOne()
+
+  return blog._id.toString()
+}
+
 const initialBlogs = biggerList
 
 const blogsInDb = async () => {
@@ -9,5 +22,5 @@ const blogsInDb = async () => {
 }
 
 module.exports = {
-  blogsInDb, initialBlogs
+  blogsInDb, initialBlogs, nonExistingId
 }
