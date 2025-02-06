@@ -211,6 +211,85 @@ describe('when there is initially one user in db', () => {
   })
 })
 
+describe('username and password validation', () => {
+  test('creation fails with proper statuscode and message if username is ommited', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      name: 'test_user',
+      password: 'testpass'
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    assert(result.body.error.includes('username: Path `username` is required'))
+
+    const usersAtEnd = await helper.usersInDb()
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+  })
+
+  test('creation fails with proper statuscode and message if password is ommited', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'test_user',
+      name: 'test_name'
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    assert(result.body.error.includes('missing password'))
+
+    const usersAtEnd = await helper.usersInDb()
+
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+  })
+
+  test.only('creation fails with proper statuscode and message if username or password is less than 3 chars', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const shortUser = {
+      username: '12',
+      name: 'test_name',
+      password: 'password'
+    }
+
+    let result = await api
+      .post('/api/users')
+      .send(shortUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    assert(result.body.error.includes('Path `username` (`12`) is shorter than the minimum allowed length (3)'))
+
+    const shortPass = {
+      username: 'test_user',
+      name: 'test_name',
+      password: '12'
+    }
+
+    result = await api
+      .post('/api/users')
+      .send(shortPass)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    assert(result.body.error.includes('password must be atleast 3 characters'))
+
+    const usersAtEnd = await helper.usersInDb()
+
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+  })
+})
+
 after (async () => {
   await mongoose.connection.close()
 })
