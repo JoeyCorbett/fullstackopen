@@ -4,7 +4,6 @@ const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 
 
-
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
   response.json(blogs)
@@ -40,8 +39,20 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
-  const test = await Blog.findByIdAndDelete(request.params.id)
-  if (test) {
+  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'token invalid' })
+  }
+
+  const userId = decodedToken.id
+  const blog = await Blog.findById(request.params.id)
+
+  if (blog.user.toString() !== userId.toString()) {
+    return response.status(403).json({ error: 'You do not have permission to delete this resource' })
+  }
+
+  const deleteReq = await Blog.findByIdAndDelete(request.params.id)
+  if (deleteReq) {
     response.status(204).end()
   } else {
     response.status(404).end()
