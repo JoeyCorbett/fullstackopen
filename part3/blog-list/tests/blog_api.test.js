@@ -253,7 +253,7 @@ describe('username and password validation', () => {
     assert.strictEqual(usersAtEnd.length, usersAtStart.length)
   })
 
-  test.only('creation fails with proper statuscode and message if username or password is less than 3 chars', async () => {
+  test('creation fails with proper statuscode and message if username or password is less than 3 chars', async () => {
     const usersAtStart = await helper.usersInDb()
 
     const shortUser = {
