@@ -11,6 +11,8 @@ const helper = require('./api_test_helper')
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
+let userJwt
+
 beforeEach(async () => {
   await Blog.deleteMany({})
 
@@ -18,6 +20,20 @@ beforeEach(async () => {
     .map(blog => new Blog(blog))
   const promiseArray = blogObjects.map(blog => blog.save())
   await Promise.all(promiseArray)
+
+  const username = 'testUser'
+  const password = 'testPass'
+
+  const newUser = { username, password }
+  await api
+    .post('/api/users')
+    .send(newUser)
+
+  const res = await api
+    .post('/api/login')
+    .send({ username, password })
+
+  userJwt = res.body.token
 })
 
 describe('api tests', () => {
@@ -36,16 +52,17 @@ describe('api tests', () => {
     assert.strictEqual(Object.keys(blogsAtStart[0])[4], 'id')
   })
 
-  test('a valid note can be added', async () => {
+  test('a valid blog can be added', async () => {
     const newBlog = {
       title: 'test note',
       author: 'test author',
       url: 'https://example.com',
-      likes: 25,
+      likes: 0,
     }
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${userJwt}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -58,6 +75,21 @@ describe('api tests', () => {
     assert(titles.includes('test note'))
   })
 
+  test.only('blog added w/out token fails with status code 401', async () => {
+    const newBlog = {
+      title: 'test note',
+      author: 'test author',
+      url: 'https://example.com',
+      likes: 0,
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
+      .expect('Content-Type', /application\/json/)
+  })
+
   test('blog added witout id defaults to 0', async () => {
     const newBlog = {
       title: 'test note',
@@ -67,6 +99,7 @@ describe('api tests', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${userJwt}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -88,6 +121,7 @@ test('blog without title returns 400', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${userJwt}`)
     .send(noTitle)
     .expect(400)
 })
@@ -101,6 +135,7 @@ test('blog without url returns 400', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${userJwt}`)
     .send(noUrl)
     .expect(400)
 })
@@ -112,6 +147,7 @@ describe('deletion of a blog', () => {
 
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', `Bearer ${userJwt}`)
       .expect(204)
 
     const blogsAtEnd = await helper.blogsInDb()
@@ -122,11 +158,12 @@ describe('deletion of a blog', () => {
     assert(!contents.includes(blogToDelete.title))
   })
 
-  test('fails with stauts code 404 if id is not valid', async () => {
+  test('fails with status code 404 if id is not valid', async () => {
     const validNonexistingId = await helper.nonExistingId()
 
     await api
       .delete(`/api/blogs/${validNonexistingId}`)
+      .set('Authorization', `Bearer ${userJwt}`)
       .expect(404)
   })
 })
@@ -140,6 +177,7 @@ describe('updating a blog', () => {
 
     await api
       .put(`/api/blogs/${updatedBlogBefore.id}`)
+      .set('Authorization', `Bearer ${userJwt}`)
       .send(updatedBlogBefore)
       .expect(200)
       .expect('Content-Type', /application\/json/)
