@@ -11,6 +11,7 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [info, setInfo] = useState({ message: null })
+  const [blogVisible, setBlogVisible] = useState(false)
   const [newBlog, setNewBlog] = useState({
     title: '',
     author: '',
@@ -118,6 +119,27 @@ const App = () => {
     }, 3000)
   }
 
+  const blogForm = () => {
+    const hideWhenVisible = { display: blogVisible ? 'none' : '' }
+    const showWhenVisible = { display: blogVisible ? '' : 'none' }
+
+    return (
+      <div>
+        <div style={hideWhenVisible}>
+          <button onClick={() => setBlogVisible(true)}>new blog</button>
+        </div>
+        <div style={showWhenVisible}>
+          <BlogForm
+            newBlog={newBlog}
+            handleNewBlog={handleNewBlog}
+            handleChange={handleChange}
+          />
+          <button onClick={() => setBlogVisible(false)}>cancel</button>
+        </div>
+      </div>
+    )
+  }
+
   if (user === null) {
     return (
       <div>
@@ -137,11 +159,7 @@ const App = () => {
       </p>
       <div>
         <h2>create new</h2>
-        <BlogForm
-         handleNewBlog={handleNewBlog}
-         handleChange={handleChange}
-         newBlog={newBlog}
-         />
+        {blogForm()}
       </div>
     
       {blogs.map(blog =>
