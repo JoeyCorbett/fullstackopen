@@ -12,11 +12,6 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [info, setInfo] = useState({ message: null })
   const [blogVisible, setBlogVisible] = useState(false)
-  const [newBlog, setNewBlog] = useState({
-    title: '',
-    author: '',
-    url: '',
-  })
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -83,25 +78,10 @@ const App = () => {
     </form>      
   )
 
-  const handleChange = (e) => {
-    setNewBlog({
-      ...newBlog,
-      [e.target.name]: e.target.value,
-    })
-  }
-
-  const handleNewBlog = async (event) => {
-    event.preventDefault()
-
+  const createBlog = async (blogObj) => {
     try {
-      const returnedBlog = await blogService.create(newBlog)
+      const returnedBlog = await blogService.create(blogObj)
       setBlogs(blogs.concat(returnedBlog))
-      setNewBlog({
-        title: '',
-        author: '',
-        url: '',
-      })
-      notifyWith(`A New Blog: ${newBlog.title} by ${newBlog.author} added`)
     } catch (error) {
       notifyWith('Error creating blog', 'error')
       console.log('Error creating blog', error)
@@ -130,9 +110,8 @@ const App = () => {
         </div>
         <div style={showWhenVisible}>
           <BlogForm
-            newBlog={newBlog}
-            handleNewBlog={handleNewBlog}
-            handleChange={handleChange}
+            createBlog={createBlog}
+            notifyWith={notifyWith}
           />
           <button onClick={() => setBlogVisible(false)}>cancel</button>
         </div>
