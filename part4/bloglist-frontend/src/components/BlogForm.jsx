@@ -7,9 +7,9 @@ const BlogForm = ({ createBlog, notifyWith }) => {
     url: '',
   })
 
-  const addBlog = (event) => {
+  const addBlog = async (event) => {
     event.preventDefault()
-    createBlog(newBlog)
+    await createBlog(newBlog)
 
     setNewBlog({
       title: '',

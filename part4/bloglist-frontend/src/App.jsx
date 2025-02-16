@@ -89,6 +89,10 @@ const App = () => {
     }
   }
 
+  const updateBlog = (id, blogObj) => {
+    setBlogs(blogs.map(b => b.id === id ? blogObj : b))
+  }
+
   const notifyWith = (message, type = 'info') => {
     setInfo({
       message,
@@ -134,7 +138,11 @@ const App = () => {
       </div>
     
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog
+          key={blog.id}
+          blog={blog}
+          updateBlog={updateBlog}
+        />
       )}
     </div>
   )
