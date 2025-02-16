@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
+import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -100,22 +101,13 @@ const App = () => {
   }
 
   const blogForm = () => {
-    const hideWhenVisible = { display: blogVisible ? 'none' : '' }
-    const showWhenVisible = { display: blogVisible ? '' : 'none' }
-
     return (
-      <div>
-        <div style={hideWhenVisible}>
-          <button onClick={() => setBlogVisible(true)}>new blog</button>
-        </div>
-        <div style={showWhenVisible}>
+      <Togglable buttonLabel="create new blog">
           <BlogForm
             createBlog={createBlog}
             notifyWith={notifyWith}
           />
-          <button onClick={() => setBlogVisible(false)}>cancel</button>
-        </div>
-      </div>
+        </Togglable>
     )
   }
 
