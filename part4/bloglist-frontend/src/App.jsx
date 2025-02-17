@@ -8,11 +8,11 @@ import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
+  const [sortedBlogs, setSortedBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [info, setInfo] = useState({ message: null })
-  const [blogVisible, setBlogVisible] = useState(false)
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -28,6 +28,11 @@ const App = () => {
       blogService.setToken(user.token)
     }
   }, [])
+
+  useEffect(() => {
+    const sorted = [...blogs].sort((a, b) => b.likes - a.likes)
+    setSortedBlogs(sorted)
+  }, [blogs])
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -47,7 +52,7 @@ const App = () => {
     } catch (exception) {
       notifyWith('Wrong username or password', 'error')
     }
-  }
+  } 
 
   const handleLogout = async (event) => {
     event.preventDefault()
@@ -83,6 +88,9 @@ const App = () => {
     try {
       const returnedBlog = await blogService.create(blogObj)
       setBlogs(blogs.concat(returnedBlog))
+      notifyWith(
+        `A New Blog: ${returnedBlog.title} by ${returnedBlog.author} added`
+      )
     } catch (error) {
       notifyWith('Error creating blog', 'error')
       console.log('Error creating blog', error)
@@ -137,7 +145,7 @@ const App = () => {
         {blogForm()}
       </div>
     
-      {blogs.map(blog =>
+      {sortedBlogs.map(blog =>
         <Blog
           key={blog.id}
           blog={blog}

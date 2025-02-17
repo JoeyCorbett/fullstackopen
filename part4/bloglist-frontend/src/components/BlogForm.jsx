@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const BlogForm = ({ createBlog, notifyWith }) => {
+const BlogForm = ({ createBlog }) => {
   const [newBlog, setNewBlog] = useState({
     title: '',
     author: '',
@@ -16,7 +16,6 @@ const BlogForm = ({ createBlog, notifyWith }) => {
       author: '',
       url: '',
     })
-    notifyWith(`A New Blog: ${newBlog.title} by ${newBlog.author} added`)
   }
 
   const handleChange = (e) => {
