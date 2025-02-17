@@ -54,6 +54,18 @@ const App = () => {
     }
   } 
 
+  const handleDelete = async (blog) => {
+    if (window.confirm(`Remove Blog ${blog.title} by ${blog.author}`)) {
+      try {
+        await blogService.deleteBlog(blog.id)
+        const newBlogs = blogs.filter(b => b.id !== blog.id)
+        setBlogs(newBlogs)
+      } catch (error) {
+        console.log('Error', error)
+      }
+    }
+  }
+
   const handleLogout = async (event) => {
     event.preventDefault()
     window.localStorage.removeItem('loggedBlogAppUser')
@@ -150,6 +162,8 @@ const App = () => {
           key={blog.id}
           blog={blog}
           updateBlog={updateBlog}
+          user={user}
+          handleDelete={handleDelete}
         />
       )}
     </div>
