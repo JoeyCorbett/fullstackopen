@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import blogService from '../services/blogs'
+import propTypes from 'prop-types'
 
 const Blog = ({ blog, updateBlog, user, handleDelete }) => {
   const [showDetails, setShowDetails] = useState(false)
@@ -22,13 +23,13 @@ const Blog = ({ blog, updateBlog, user, handleDelete }) => {
       console.log('Error liking blog', error)
     }
   }
-  
+
   const blogStyle = {
     padding: 10,
     paddingLeft: 2,
     border: 'solid',
     borderWidth: 1,
-    marginBottom: 5
+    marginBottom: 5,
   }
 
   if (showDetails === true) {
@@ -44,9 +45,9 @@ const Blog = ({ blog, updateBlog, user, handleDelete }) => {
           <button onClick={handleLike}>like</button>
         </div>
         <div>{blog.author}</div>
-        {user.id === blog.user.id && 
+        {user.id === blog.user.id && (
           <button onClick={() => handleDelete(blog)}>remove</button>
-        }
+        )}
       </div>
     )
   }
@@ -57,9 +58,16 @@ const Blog = ({ blog, updateBlog, user, handleDelete }) => {
         {blog.title} {''}
         {blog.author} {''}
         <button onClick={toggleDetails}>view</button>
-      </div> 
-    </div> 
+      </div>
+    </div>
   )
+}
+
+Blog.propTypes = {
+  blog: propTypes.object.isRequired,
+  updateBlog: propTypes.func.isRequired,
+  user: propTypes.object.isRequired,
+  handleDelete: propTypes.func.isRequired
 }
 
 export default Blog

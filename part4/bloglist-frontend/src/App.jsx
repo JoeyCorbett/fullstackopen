@@ -17,7 +17,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -48,11 +48,11 @@ const App = () => {
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
-      setPassword('') 
+      setPassword('')
     } catch (exception) {
       notifyWith('Wrong username or password', 'error')
     }
-  } 
+  }
 
   const handleDelete = async (blog) => {
     if (window.confirm(`Remove Blog ${blog.title} by ${blog.author}`)) {
@@ -76,7 +76,7 @@ const App = () => {
     <form onSubmit={handleLogin}>
       <div>
         username
-          <input
+        <input
           type="text"
           value={username}
           name="Username"
@@ -85,7 +85,7 @@ const App = () => {
       </div>
       <div>
         password
-          <input
+        <input
           type="password"
           value={password}
           name="Password"
@@ -93,7 +93,7 @@ const App = () => {
         />
       </div>
       <button type="submit">login</button>
-    </form>      
+    </form>
   )
 
   const createBlog = async (blogObj) => {
@@ -127,11 +127,11 @@ const App = () => {
   const blogForm = () => {
     return (
       <Togglable buttonLabel="create new blog">
-          <BlogForm
-            createBlog={createBlog}
-            notifyWith={notifyWith}
-          />
-        </Togglable>
+        <BlogForm
+          createBlog={createBlog}
+          notifyWith={notifyWith}
+        />
+      </Togglable>
     )
   }
 
@@ -156,7 +156,7 @@ const App = () => {
         <h2>create new</h2>
         {blogForm()}
       </div>
-    
+
       {sortedBlogs.map(blog =>
         <Blog
           key={blog.id}
